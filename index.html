@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE JERMEY MACLION</title>
+<style>
+  :root {
+    --bg: #070b14;
+    --panel: #11192c;
+    --border: #293856;
+    --gold: #fbbf24;
+    --neon: #38bdf8;
+    --green: #22c55e;
+    --red: #ef4444;
+  }
+  * { box-sizing: border-box; font-family: 'Trebuchet MS', 'Inter', system-ui, sans-serif; }
+  body { margin: 0; background: radial-gradient(circle at top, #1e293b 0%, #070b14 75%); color: #f8fafc; min-height: 100vh; }
+
+  .cartoon-headshot {
+    width: 76px; height: 76px; border-radius: 50%; object-fit: cover;
+    border: 4px solid var(--gold); background: #1e293b;
+    filter: contrast(1.4) saturate(1.65) brightness(1.05) drop-shadow(0 4px 0px #000);
+    transition: transform 0.2s;
+  }
+  .player-card:hover .cartoon-headshot { transform: scale(1.08) rotate(-3deg); }
+
+  header {
+    background: rgba(11, 17, 32, 0.96); border-bottom: 3px solid var(--gold);
+    padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 14px; position: sticky; top: 0; z-index: 100;
+  }
+  .brand { font-size: 28px; font-weight: 900; color: var(--gold); text-shadow: 3px 3px 0px #000; letter-spacing: 1px; }
+  .hud-bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .hud-pill { background: #1e293b; border: 2px solid #334155; padding: 7px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; }
+  .hud-pill span { color: var(--neon); font-weight: 900; }
+  .pts-badge { background: linear-gradient(135deg, #fbbf24, #d97706); color: #090d16; padding: 8px 18px; border-radius: 12px; font-size: 17px; font-weight: 900; border: 2px solid #fff; }
+
+  .container { max-width: 1180px; margin: 22px auto; padding: 0 16px; }
+  .sport-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .sport-btn {
+    background: #172136; border: 3px solid #2e4166; color: #fff; padding: 14px;
+    border-radius: 14px; font-size: 16px; font-weight: 900; cursor: pointer; transition: 0.2s;
+    text-shadow: 1px 1px 0 #000;
+  }
+  .sport-btn.active, .sport-btn:hover { background: #1d4ed8; border-color: var(--gold); transform: translateY(-2px); }
+
+  .card { background: var(--panel); border: 2px solid var(--border); border-radius: 18px; padding: 20px; box-shadow: 0 10px 28px rgba(0,0,0,0.5); margin-bottom: 20px; }
+
+  .q-progress { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 16px; }
+  @media (max-width: 760px) { .q-progress { grid-template-columns: repeat(3, 1fr); } .sport-tabs { grid-template-columns: repeat(2, 1fr); } }
+  .q-step {
+    background: #0b1120; border: 2px solid #334155; border-radius: 10px; padding: 10px 6px;
+    text-align: center; font-size: 12px; font-weight: 800;
+  }
+  .q-step.current { border-color: var(--gold); background: #1e3a8a; }
+  .q-step.done { border-color: var(--green); background: rgba(34, 197, 94, 0.15); }
+  .q-step.miss { border-color: var(--red); background: rgba(239, 68, 68, 0.15); }
+
+  .question-banner {
+    background: linear-gradient(135deg, #0b1329, #1e293b); border: 3px solid var(--neon);
+    border-radius: 16px; padding: 20px; text-align: center;
+  }
+  .q-title { font-size: 22px; font-weight: 900; color: #fde047; margin: 6px 0 12px 0; }
+  .input-row { position: relative; display: flex; gap: 10px; max-width: 720px; margin: 0 auto; }
+  .ans-input {
+    flex: 1; padding: 14px; border-radius: 12px; border: 2px solid #475569;
+    background: #070b14; color: #fff; font-size: 16px; font-weight: 700; outline: none;
+  }
+  .ans-input:focus { border-color: var(--gold); }
+  .submit-btn {
+    background: linear-gradient(135deg, #22c55e, #15803d); color: #fff; border: 2px solid #fff;
+    padding: 0 22px; border-radius: 12px; font-weight: 900; font-size: 15px; cursor: pointer;
+  }
+
+  .rarity-legend {
+    display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; font-size: 11px;
+  }
+  .rarity-pill {
+    background: #0b1120; border: 1px solid #334155; padding: 4px 10px; border-radius: 8px; font-weight: 800;
+  }
+
+  #postSixPopUp { display: none; }
+  .popup-grid { display: grid; grid-template-columns: 1.15fr 1.25fr; gap: 20px; }
+  @media (max-width: 920px) { .popup-grid { grid-template-columns: 1fr; } }
+
+  .roster-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+  .player-card {
+    background: #0b1120; border: 2px solid #334155; border-radius: 14px; padding: 10px;
+    display: flex; gap: 10px; align-items: center;
+  }
+  .player-card.selected { border-color: var(--green); background: rgba(34, 197, 94, 0.16); box-shadow: 0 0 14px rgba(34,197,94,0.4); }
+  .p-info { flex: 1; }
+  .p-name { font-weight: 900; font-size: 15px; color: #fbbf24; }
+  .p-tier { font-size: 11px; color: #38bdf8; font-weight: 700; }
+  .p-stats { font-size: 11px; color: #cbd5e1; margin: 3px 0 6px 0; }
+  .buy-btn {
+    background: var(--gold); color: #090d16; border: none; padding: 6px 12px;
+    border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer;
+  }
+
+  canvas#gameCanvas {
+    width: 100%; max-width: 640px; height: 340px; background: #062814;
+    border-radius: 14px; border: 3px solid #fff; display: block; margin: 12px auto;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">🦁 THE JERMEY MACLION</div>
+  <div class="hud-bar">
+    <div class="hud-pill">📅 Date: <span id="hudDate"></span></div>
+    <div class="hud-pill">🕛 12:00 AM Reset: <span id="hudCountdown">00:00:00</span></div>
+    <div class="hud-pill">🔥 Today's Points: <span id="hudTodayPts">0</span> PTS</div>
+    <div class="pts-badge">💰 Bank: <span id="hudBankPts">0</span> PTS</div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="sport-tabs">
+    <button class="sport-btn active" onclick="switchSport('MLB', this)">⚾ MLB</button>
+    <button class="sport-btn" onclick="switchSport('NFL', this)">🏈 NFL</button>
+    <button class="sport-btn" onclick="switchSport('EPL', this)">⚽ EPL</button>
+    <button class="sport-btn" onclick="switchSport('NBA', this)">🏀 NBA</button>
+  </div>
+
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+      <div style="font-weight:900; color:#38bdf8; font-size:16px;" id="sportHeaderLabel">⚾ MLB — 6 DAILY QUESTIONS</div>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <div style="font-weight:900; color:#4ade80; font-size:16px;">6-Question Added Score: <span id="sixQTotal">0</span> PTS</div>
+        <button class="buy-btn" style="background:#334155; color:#cbd5e1;" onclick="resetCurrentSportTesting()">🔄 Replay 6 Questions</button>
+      </div>
+    </div>
+
+    <div class="q-progress" id="qProgressRow"></div>
+
+    <div class="question-banner" id="qBannerBox">
+      <div class="q-title" id="qPromptText">Loading question...</div>
+      <div style="font-size:13px; color:#cbd5e1; margin-bottom:12px;">
+        Full names, last names, and team nicknames accepted! <strong>Less popular names = Lower % Rarity = More Points!</strong>
+      </div>
+      <div class="input-row" id="inputRowBox">
+        <input type="text" id="ansInput" class="ans-input" placeholder="Type any valid player or team..." onkeydown="if(event.key==='Enter') submitAnswer()">
+        <button class="submit-btn" id="lockBtn" onclick="submitAnswer()">⚡ SUBMIT</button>
+      </div>
+      <div class="rarity-legend">
+        <div class="rarity-pill" style="color:#f59e0b;">💎 Ultra-Rare (1–3%): 250–300 PTS</div>
+        <div class="rarity-pill" style="color:#38bdf8;">🔥 Rare (4–9%): 150–235 PTS</div>
+        <div class="rarity-pill" style="color:#4ade80;">⚡ Uncommon (10–18%): 90–145 PTS</div>
+        <div class="rarity-pill" style="color:#a3e635;">✅ Common (19%+): 40–85 PTS</div>
+      </div>
+    </div>
+
+    <div id="lastPlayFeedback" style="text-align:center; font-weight:900; font-size:17px; min-height:26px; color:#fde047; margin-top:12px;"></div>
+  </div>
+
+  <div id="postSixPopUp">
+    <div class="popup-grid">
+      <div class="card">
+        <h3 style="margin:0 0 6px 0; color:#fbbf24;">🃏 Step 2: Pick / Buy Your Player for Today's <span id="rosterSportLabel">MLB</span> Challenge</h3>
+        <p style="margin:0 0 10px 0; font-size:12px; color:#cbd5e1;">
+          Use your points to unlock higher-tier players with slower meters, larger green zones, more power, and faster speed!
+        </p>
+        <div class="roster-grid" id="rosterGrid"></div>
+      </div>
+
+      <div class="card" style="text-align:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div style="text-align:left;">
+            <div style="font-size:18px; font-weight:900; color:#fbbf24;" id="challengeTitle">🎯 CHALLENGE STAGE</div>
+            <div style="font-size:12px; color:#cbd5e1;" id="challengeControlsHint"></div>
+          </div>
+          <button class="submit-btn" style="background:linear-gradient(135deg,#fbbf24,#d97706); color:#090d16; padding:10px 18px;" onclick="startSportChallenge()">▶ START CHALLENGE</button>
+        </div>
+
+        <canvas id="gameCanvas" width="640" height="340" tabindex="0"></canvas>
+        <div id="challengeOutcomeText" style="font-size:17px; font-weight:900; color:#4ade80; min-height:26px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 10px 0; color:#38bdf8;">📊 Saved Daily Points Tracker</h3>
+    <div id="dailyHistoryList" style="font-size:14px;"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================================
+// PLAYER POOLS & COMPLETE TRIVIA DATABASES WITH POPULARITY/RARITY %
+// (Lower number = Less popular / More rare = MORE POINTS)
+// ============================================================================
+const ALL_PLAYERS_POOL = {
+  MLB: [
+    {id: "mlb_stubbs", tier: 1, name: "Garrett Stubbs", role: "Tier 1 • Backup C", cost: 0, pitch_speed: 6.4, green_size: 30, power: 58, img: "https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/596117/headshot/67/current"},
+    {id: "mlb_bohm", tier: 2, name: "Alec Bohm", role: "Tier 2 • Gap Line-Drive 3B", cost: 150, pitch_speed: 5.2, green_size: 42, power: 74, img: "https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/664761/headshot/67/current"},
+    {id: "mlb_schwarber", tier: 3, name: "Kyle Schwarber", role: "Tier 3 • Schwarbomb DH", cost: 300, pitch_speed: 4.2, green_size: 52, power: 88, img: "https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/656941/headshot/67/current"},
+    {id: "mlb_utley", tier: 4, name: "Chase Utley", role: "Tier 4 • World Series Legend", cost: 500, pitch_speed: 3.5, green_size: 64, power: 89, img: "https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/400284/headshot/67/current"},
+    {id: "mlb_harper", tier: 5, name: "Bryce Harper", role: "Tier 5 • 2x NL MVP Showman", cost: 750, pitch_speed: 2.7, green_size: 76, power: 96, img: "https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/547180/headshot/67/current"},
+    {id: "mlb_bonds", tier: 6, name: "Barry Bonds", role: "Tier 6 (BEST) • 762-HR King", cost: 1050, pitch_speed: 1.9, green_size: 94, power: 99, img: "https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/111188/headshot/67/current"}
+  ],
+  NFL: [
+    {id: "nfl_scott", tier: 1, name: "Boston Scott", role: "Tier 1 • Backup RB", cost: 0, run_speed: 3.0, agility: 3.0, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Boston_Scott_2019.jpg/220px-Boston_Scott_2019.jpg"},
+    {id: "nfl_goedert", tier: 2, name: "Dallas Goedert", role: "Tier 2 • Bulldozer TE", cost: 150, run_speed: 4.0, agility: 4.2, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Dallas_Goedert_2021.jpg/220px-Dallas_Goedert_2021.jpg"},
+    {id: "nfl_kelce", tier: 3, name: "Jason Kelce", role: "Tier 3 • All-Pro Center Legend", cost: 300, run_speed: 5.1, agility: 5.5, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Jason_Kelce_2022.jpg/220px-Jason_Kelce_2022.jpg"},
+    {id: "nfl_djax", tier: 4, name: "DeSean Jackson", role: "Tier 4 • Speedster Returner", cost: 500, run_speed: 6.3, agility: 6.8, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/DeSean_Jackson_2019.jpg/220px-DeSean_Jackson_2019.jpg"},
+    {id: "nfl_saquon", tier: 5, name: "Saquon Barkley", role: "Tier 5 • All-Pro Hurdle King", cost: 750, run_speed: 7.6, agility: 8.2, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Saquon_Barkley_2022.jpg/220px-Saquon_Barkley_2022.jpg"},
+    {id: "nfl_maclin", tier: 6, name: "Jeremy Maclin", role: "Tier 6 (BEST) • Maclion 99 OVR", cost: 1050, run_speed: 9.2, agility: 9.6, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Jeremy_Maclin_2014.jpg/220px-Jeremy_Maclin_2014.jpg"}
+  ],
+  EPL: [
+    {id: "epl_werner", tier: 1, name: "Timo Werner", role: "Tier 1 • Fast Wild Meter", cost: 0, meter_speed: 3.5, green_zone: 18, flash_ms: 360, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Timo_Werner_2018.jpg/220px-Timo_Werner_2018.jpg"},
+    {id: "epl_grealish", tier: 2, name: "Jack Grealish", role: "Tier 2 • Wing Playmaker", cost: 150, meter_speed: 2.8, green_zone: 27, flash_ms: 500, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Jack_Grealish_2021.jpg/220px-Jack_Grealish_2021.jpg"},
+    {id: "epl_palmer", tier: 3, name: "Cole Palmer", role: "Tier 3 • Cold Penalty Ace", cost: 300, meter_speed: 2.2, green_zone: 36, flash_ms: 680, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Cole_Palmer_2024.jpg/220px-Cole_Palmer_2024.jpg"},
+    {id: "epl_salah", tier: 4, name: "Mohamed Salah", role: "Tier 4 • Egyptian King", cost: 500, meter_speed: 1.7, green_zone: 46, flash_ms: 860, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Mohamed_Salah_2018.jpg/220px-Mohamed_Salah_2018.jpg"},
+    {id: "epl_henry", tier: 5, name: "Thierry Henry", role: "Tier 5 • Invincibles Icon", cost: 750, meter_speed: 1.25, green_zone: 58, flash_ms: 1100, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Thierry_Henry_2012.jpg/220px-Thierry_Henry_2012.jpg"},
+    {id: "epl_r9", tier: 6, name: "Ronaldo 9 (R9)", role: "Tier 6 (BEST) • O Fenomeno", cost: 1050, meter_speed: 0.85, green_zone: 72, flash_ms: 1450, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Ronaldo_2002_cropped.jpg/220px-Ronaldo_2002_cropped.jpg"}
+  ],
+  NBA: [
+    {id: "nba_simmons", tier: 1, name: "Ben Simmons", role: "Tier 1 • Shaky Meter", cost: 0, meter_speed: 3.6, green_zone: 18, flash_ms: 360, img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1627732.png"},
+    {id: "nba_maxey", tier: 2, name: "Tyrese Maxey", role: "Tier 2 • All-Star Speed Guard", cost: 150, meter_speed: 2.8, green_zone: 28, flash_ms: 520, img: "https://cdn.nba.com/headshots/nba/latest/1040x760/1630178.png"},
+    {id: "nba_lillard", tier: 3, name: "Damian Lillard", role: "Tier 3 • Dame Time Range", cost: 300, meter_speed: 2.2, green_zone: 36, flash_ms: 700, img: "https://cdn.nba.com/headshots/nba/latest/1040x760/203081.png"},
+    {id: "nba_iverson", tier: 4, name: "Allen Iverson", role: "Tier 4 • The Answer MVP", cost: 500, meter_speed: 1.65, green_zone: 48, flash_ms: 900, img: "https://cdn.nba.com/headshots/nba/latest/1040x760/947.png"},
+    {id: "nba_lebron", tier: 5, name: "LeBron James", role: "Tier 5 • All-Time Scoring King", cost: 750, meter_speed: 1.25, green_zone: 60, flash_ms: 1150, img: "https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png"},
+    {id: "nba_curry", tier: 6, name: "Stephen Curry", role: "Tier 6 (BEST) • Half-Court Chef", cost: 1050, meter_speed: 0.85, green_zone: 74, flash_ms: 1500, img: "https://cdn.nba.com/headshots/nba/latest/1040x760/201939.png"}
+  ]
+};
+
+const QUESTIONS_BANK = {
+  MLB: [
+    {
+      prompt: "Name an MLB Player in the 500+ Career Home Run Club",
+      wikiHint: ["home run", "500 home run", "baseball"],
+      answers: {
+        "Barry Bonds": 32, "Babe Ruth": 31, "Hank Aaron": 26, "Alex Rodriguez": 23, "Albert Pujols": 21,
+        "Ken Griffey Jr.": 20, "Willie Mays": 16, "David Ortiz": 16, "Mickey Mantle": 15, "Sammy Sosa": 14,
+        "Mark McGwire": 14, "Miguel Cabrera": 13, "Jim Thome": 11, "Reggie Jackson": 9, "Mike Schmidt": 8,
+        "Manny Ramirez": 8, "Frank Thomas": 6, "Frank Robinson": 5, "Ted Williams": 5, "Harmon Killebrew": 4,
+        "Rafael Palmeiro": 3, "Gary Sheffield": 2, "Eddie Murray": 2, "Jimmie Foxx": 2, "Willie McCovey": 2,
+        "Ernie Banks": 2, "Eddie Mathews": 1, "Mel Ott": 1, "Giancarlo Stanton": 4
+      }
+    },
+    {
+      prompt: "Name an MLB Franchise that has won a World Series since 1990",
+      wikiHint: ["World Series", "Major League Baseball"],
+      answers: {
+        "New York Yankees": 33, "Boston Red Sox": 26, "Los Angeles Dodgers": 25, "San Francisco Giants": 20,
+        "Houston Astros": 17, "Atlanta Braves": 15, "Philadelphia Phillies": 15, "St. Louis Cardinals": 14,
+        "Chicago Cubs": 13, "Texas Rangers": 8, "Washington Nationals": 6, "Toronto Blue Jays": 6,
+        "Kansas City Royals": 5, "Arizona Diamondbacks": 5, "Chicago White Sox": 3, "Miami Marlins": 2,
+        "Florida Marlins": 2, "Los Angeles Angels": 2, "Anaheim Angels": 1, "Minnesota Twins": 1, "Cincinnati Reds": 1
+      }
+    },
+    {
+      prompt: "Name an MLB Pitcher who has won a Cy Young Award since 2000",
+      wikiHint: ["Cy Young Award", "pitcher"],
+      answers: {
+        "Clayton Kershaw": 28, "Justin Verlander": 26, "Max Scherzer": 24, "Randy Johnson": 21, "Pedro Martinez": 20,
+        "Gerrit Cole": 19, "Jacob deGrom": 16, "Roy Halladay": 14, "Roger Clemens": 13, "Tim Lincecum": 12,
+        "CC Sabathia": 11, "Zack Greinke": 11, "Chris Sale": 10, "Blake Snell": 8, "Tarik Skubal": 7,
+        "Felix Hernandez": 7, "Cliff Lee": 6, "Corey Kluber": 5, "Corbin Burnes": 5, "Jake Arrieta": 5,
+        "Sandy Alcantara": 4, "Shane Bieber": 4, "Trevor Bauer": 4, "Johan Santana": 3, "David Price": 3,
+        "Dallas Keuchel": 2, "Robbie Ray": 2, "Barry Zito": 2, "Eric Gagne": 2, "Bartolo Colon": 2,
+        "Jake Peavy": 2, "Chris Carpenter": 2, "Brandon Webb": 1, "R.A. Dickey": 1, "Rick Porcello": 1
+      }
+    },
+    {
+      prompt: "Name an MLB Player who has won NL or AL MVP since 2005",
+      wikiHint: ["Most Valuable Player", "Major League Baseball"],
+      answers: {
+        "Shohei Ohtani": 33, "Aaron Judge": 29, "Mike Trout": 26, "Bryce Harper": 24, "Albert Pujols": 21,
+        "Alex Rodriguez": 19, "Mookie Betts": 15, "Ronald Acuna Jr.": 14, "Miguel Cabrera": 13, "Ryan Howard": 12,
+        "Jimmy Rollins": 10, "Clayton Kershaw": 10, "Cody Bellinger": 9, "Freddie Freeman": 9, "Giancarlo Stanton": 7,
+        "Kris Bryant": 6, "Buster Posey": 6, "Christian Yelich": 5, "Joey Votto": 5, "Josh Hamilton": 4,
+        "Paul Goldschmidt": 4, "Jose Altuve": 4, "Dustin Pedroia": 3, "Robinson Cano": 2, "Andrew McCutchen": 2,
+        "Josh Donaldson": 2, "Joe Mauer": 2, "Justin Morneau": 1, "Jose Abreu": 1
+      }
+    },
+    {
+      prompt: "Name an MLB Player in the 3,000+ Career Hits Club",
+      wikiHint: ["3,000 hit club", "baseball"],
+      answers: {
+        "Pete Rose": 30, "Derek Jeter": 29, "Ichiro Suzuki": 24, "Hank Aaron": 22, "Albert Pujols": 20,
+        "Miguel Cabrera": 19, "Ty Cobb": 16, "Willie Mays": 15, "Alex Rodriguez": 14, "Cal Ripken Jr.": 13,
+        "Tony Gwynn": 13, "Stan Musial": 12, "Adrian Beltre": 10, "Roberto Clemente": 10, "George Brett": 8,
+        "Rickey Henderson": 8, "Wade Boggs": 7, "Carl Yastrzemski": 6, "Craig Biggio": 5, "Rafael Palmeiro": 3,
+        "Robin Yount": 2, "Paul Molitor": 2, "Eddie Murray": 2, "Dave Winfield": 2, "Rod Carew": 2,
+        "Lou Brock": 2, "Tris Speaker": 1, "Honus Wagner": 2, "Nap Lajoie": 1, "Cap Anson": 1,
+        "Eddie Collins": 1, "Paul Waner": 1, "Al Kaline": 1
+      }
+    },
+    {
+      prompt: "Name an All-Time Philadelphia Phillies All-Star or Roster Player",
+      wikiHint: ["Philadelphia Phillies", "baseball"],
+      answers: {
+        "Bryce Harper": 30, "Mike Schmidt": 25, "Ryan Howard": 22, "Chase Utley": 21, "Jimmy Rollins": 20,
+        "Kyle Schwarber": 16, "Steve Carlton": 15, "Roy Halladay": 14, "Trea Turner": 13, "Zack Wheeler": 13,
+        "Cole Hamels": 12, "J.T. Realmuto": 11, "Aaron Nola": 9, "Cliff Lee": 8, "Alec Bohm": 8,
+        "Bryson Stott": 7, "Shane Victorino": 7, "Curt Schilling": 6, "Bobby Abreu": 6, "Nick Castellanos": 6,
+        "Brandon Marsh": 5, "Ranger Suarez": 4, "Brad Lidge": 4, "John Kruk": 3, "Jayson Werth": 3,
+        "Carlos Ruiz": 2, "Pat Burrell": 2, "Darren Daulton": 2, "Lenny Dykstra": 2, "Richie Ashburn": 2,
+        "Robin Roberts": 2, "Jim Bunning": 1, "placido Polanco": 1, "Raul Ibanez": 1, "Matt Stairs": 1,
+        "Garrett Stubbs": 1, "Odubel Herrera": 1, "Maikel Franco": 1, "Rhys Hoskins": 4, "Jean Segura": 2
+      }
+    }
+  ],
+  NFL: [
+    {
+      prompt: "Name an NFL Quarterback with 40,000+ Career Passing Yards",
+      wikiHint: ["quarterback", "passing yards", "NFL"],
+      answers: {
+        "Tom Brady": 34, "Peyton Manning": 28, "Drew Brees": 26, "Aaron Rodgers": 24, "Ben Roethlisberger": 20,
+        "Eli Manning": 19, "Brett Favre": 17, "Matthew Stafford": 16, "Dan Marino": 15, "Russell Wilson": 14,
+        "Joe Montana": 14, "Philip Rivers": 13, "Matt Ryan": 11, "John Elway": 9, "Kirk Cousins": 7,
+        "Joe Flacco": 6, "Dak Prescott": 6, "Warren Moon": 5, "Carson Palmer": 4, "Fran Tarkenton": 3,
+        "Alex Smith": 3, "Derek Carr": 3, "Jared Goff": 3, "Drew Bledsoe": 2, "Vinny Testaverde": 2,
+        "Dan Fouts": 2, "Boomer Esiason": 1, "Kerry Collins": 1, "Johnny Unitas": 2
+      }
+    },
+    {
+      prompt: "Name an NFL Wide Receiver with a 1,300+ Yard Season or Pro Bowl",
+      wikiHint: ["wide receiver", "NFL"],
+      answers: {
+        "Jerry Rice": 30, "Randy Moss": 27, "Justin Jefferson": 25, "Tyreek Hill": 24, "Terrell Owens": 22,
+        "Calvin Johnson": 21, "Davante Adams": 19, "CeeDee Lamb": 16, "A.J. Brown": 16, "Julio Jones": 15,
+        "Antonio Brown": 15, "Cooper Kupp": 14, "Ja'Marr Chase": 14, "Stefon Diggs": 11, "DeSean Jackson": 11,
+        "Larry Fitzgerald": 10, "DeVonta Smith": 9, "Marvin Harrison": 8, "Mike Evans": 8, "Amon-Ra St. Brown": 8,
+        "DeAndre Hopkins": 7, "Andre Johnson": 6, "Odell Beckham Jr.": 7, "Torry Holt": 4, "Isaac Bruce": 4,
+        "Cris Carter": 4, "Steve Smith": 3, "Chad Johnson": 3, "Reggie Wayne": 3, "Anquan Boldin": 2,
+        "Jordy Nelson": 2, "Brandon Marshall": 2, "Hines Ward": 2, "Wes Welker": 2, "Jeremy Maclin": 1,
+        "Plaxico Burress": 1, "Santana Moss": 1, "Rod Smith": 1, "Jimmy Smith": 1, "Herman Moore": 1
+      }
+    },
+    {
+      prompt: "Name an NFL Running Back with 10,000+ Rushing Yards (or 2,000-Yd Season)",
+      wikiHint: ["running back", "rushing yards", "NFL"],
+      answers: {
+        "Emmitt Smith": 31, "Barry Sanders": 28, "Walter Payton": 26, "Adrian Peterson": 24, "Derrick Henry": 23,
+        "Saquon Barkley": 20, "Frank Gore": 18, "Marshawn Lynch": 15, "LaDainian Tomlinson": 15, "Jim Brown": 14,
+        "Eric Dickerson": 13, "Jerome Bettis": 12, "LeSean McCoy": 12, "Tony Dorsett": 9, "O.J. Simpson": 8,
+        "Marshall Faulk": 8, "Marcus Allen": 7, "Curtis Martin": 6, "Franco Harris": 6, "Chris Johnson": 6,
+        "Thurman Thomas": 5, "Edgerrin James": 5, "Terrell Davis": 4, "John Riggins": 3, "Earl Campbell": 3,
+        "Jamal Lewis": 2, "Fred Taylor": 2, "Steven Jackson": 2, "Corey Dillon": 2, "Warrick Dunn": 2,
+        "Tiki Barber": 2, "Thomas Jones": 1, "Ricky Watters": 1, "Ottis Anderson": 1
+      }
+    },
+    {
+      prompt: "Name an NFL Franchise that has won at least one Super Bowl",
+      wikiHint: ["Super Bowl", "National Football League"],
+      answers: {
+        "New England Patriots": 33, "Kansas City Chiefs": 30, "Pittsburgh Steelers": 28, "Dallas Cowboys": 26,
+        "San Francisco 49ers": 25, "Green Bay Packers": 22, "Philadelphia Eagles": 20, "New York Giants": 15,
+        "Denver Broncos": 14, "Baltimore Ravens": 13, "Seattle Seahawks": 12, "Los Angeles Rams": 11,
+        "Tampa Bay Buccaneers": 9, "Miami Dolphins": 7, "Indianapolis Colts": 7, "New Orleans Saints": 6,
+        "Las Vegas Raiders": 5, "Oakland Raiders": 5, "Los Angeles Raiders": 2, "Washington Commanders": 4,
+        "Washington Redskins": 4, "Chicago Bears": 3, "New York Jets": 2, "St. Louis Rams": 2, "Baltimore Colts": 1
+      }
+    },
+    {
+      prompt: "Name an NFL Defensive Player of the Year Winner",
+      wikiHint: ["Defensive Player of the Year", "NFL"],
+      answers: {
+        "Aaron Donald": 30, "J.J. Watt": 27, "Lawrence Taylor": 25, "Ray Lewis": 24, "T.J. Watt": 22,
+        "Nick Bosa": 19, "Myles Garrett": 18, "Deion Sanders": 16, "Reggie White": 15, "Troy Polamalu": 14,
+        "Ed Reed": 14, "Khalil Mack": 11, "Von Miller": 11, "Luke Kuechly": 10, "Stephon Gilmore": 9,
+        "Micah Parsons": 8, "Patrick Surtain II": 7, "Charles Woodson": 7, "Brian Urlacher": 6, "James Harrison": 6,
+        "Derrick Brooks": 5, "Warren Sapp": 5, "Terrell Suggs": 3, "Bob Sanders": 2, "Jason Taylor": 2,
+        "Michael Strahan": 3, "Rod Woodson": 2, "Bruce Smith": 2, "Mike Singletary": 2, "Jack Lambert": 2,
+        "Joe Greene": 2, "Dana Stubblefield": 1, "Bryce Paup": 1, "Cortez Kennedy": 1, "Keith Millard": 1
+      }
+    },
+    {
+      prompt: "Name a Philadelphia Eagles or New England Patriots All-Time Great",
+      wikiHint: ["Philadelphia Eagles", "New England Patriots"],
+      answers: {
+        "Tom Brady": 32, "Jalen Hurts": 25, "Rob Gronkowski": 24, "Jason Kelce": 21, "Saquon Barkley": 18,
+        "Randy Moss": 18, "Reggie White": 17, "Brian Dawkins": 16, "A.J. Brown": 15, "Donovan McNabb": 13,
+        "Julian Edelman": 13, "LeSean McCoy": 11, "DeVonta Smith": 10, "Lane Johnson": 10, "Fletcher Cox": 9,
+        "DeSean Jackson": 9, "Nick Foles": 9, "Brandon Graham": 8, "Zach Ertz": 7, "Wes Welker": 6,
+        "Tedy Bruschi": 5, "Ty Law": 5, "Darrelle Revis": 4, "Brian Westbrook": 3, "Randall Cunningham": 3,
+        "Malcolm Jenkins": 3, "Dallas Goedert": 4, "Terrell Owens": 5, "Michael Vick": 6, "Adam Vinatieri": 4,
+        "Richard Seymour": 2, "Rodney Harrison": 2, "Mike Vrabel": 2, "Drew Bledsoe": 2, "Corey Dillon": 2,
+        "Jeremy Maclin": 1, "Vince Papale": 1, "Chuck Bednarik": 1, "Harold Carmichael": 1, "Asante Samuel": 1,
+        "Brent Celek": 1, "Connor Barwin": 1, "Trent Cole": 1, "Jeremiah Trotter": 1
+      }
+    }
+  ],
+  EPL: [
+    {
+      prompt: "Name a Player with 100+ Career Premier League Goals",
+      wikiHint: ["100 Premier League goals", "Premier League"],
+      answers: {
+        "Alan Shearer": 31, "Harry Kane": 29, "Wayne Rooney": 28, "Mohamed Salah": 27, "Thierry Henry": 26,
+        "Cristiano Ronaldo": 25, "Sergio Aguero": 22, "Frank Lampard": 16, "Steven Gerrard": 15, "Didier Drogba": 14,
+        "Son Heung-min": 13, "Jamie Vardy": 13, "Robin van Persie": 13, "Sadio Mane": 12, "Raheem Sterling": 11,
+        "Romelu Lukaku": 8, "Michael Owen": 8, "Paul Scholes": 8, "Ryan Giggs": 7, "Andy Cole": 7,
+        "Robbie Fowler": 6, "Jermain Defoe": 6, "Nicolas Anelka": 5, "Ian Wright": 4, "Teddy Sheringham": 3,
+        "Dwight Yorke": 3, "Robbie Keane": 2, "Les Ferdinand": 2, "Emile Heskey": 2, "Darren Bent": 2,
+        "Peter Crouch": 3, "Jimmy Floyd Hasselbaink": 2, "Matt Le Tissier": 1, "Dion Dublin": 1
+      }
+    },
+    {
+      prompt: "Name an English Club that has won the Premier League or played in the UCL",
+      wikiHint: ["Premier League", "English football"],
+      answers: {
+        "Manchester United": 33, "Manchester City": 31, "Liverpool": 30, "Arsenal": 28, "Chelsea": 27,
+        "Tottenham Hotspur": 16, "Newcastle United": 13, "Aston Villa": 11, "Leicester City": 7, "Leeds United": 6,
+        "Everton": 4, "Blackburn Rovers": 2, "Nottingham Forest": 2, "Derby County": 1, "Ipswich Town": 1
+      }
+    },
+    {
+      prompt: "Name a Premier League PFA Player of the Year Winner",
+      wikiHint: ["PFA Players' Player of the Year", "Premier League"],
+      answers: {
+        "Erling Haaland": 29, "Mohamed Salah": 27, "Kevin De Bruyne": 26, "Cristiano Ronaldo": 25, "Thierry Henry": 23,
+        "Virgil van Dijk": 20, "Wayne Rooney": 16, "Phil Foden": 15, "Eden Hazard": 15, "Gareth Bale": 14,
+        "Steven Gerrard": 14, "Luis Suarez": 13, "N'Golo Kante": 12, "Alan Shearer": 8, "Robin van Persie": 8,
+        "Riyad Mahrez": 7, "Ryan Giggs": 6, "Roy Keane": 6, "Patrick Vieira": 6, "Ruud van Nistelrooy": 5,
+        "John Terry": 3, "Eric Cantona": 3, "Teddy Sheringham": 2, "Mark Hughes": 2, "Dennis Bergkamp": 3,
+        "Paul McGrath": 1, "Les Ferdinand": 1, "David Ginola": 1
+      }
+    },
+    {
+      prompt: "Name a FIFA World Cup Winner who played in the Premier League",
+      wikiHint: ["FIFA World Cup", "Premier League"],
+      answers: {
+        "Thierry Henry": 28, "Paul Pogba": 22, "N'Golo Kante": 21, "Emiliano Martinez": 18, "Cesc Fabregas": 16,
+        "Fernando Torres": 15, "Mesut Ozil": 15, "David Silva": 14, "Julian Alvarez": 14, "Olivier Giroud": 13,
+        "Hugo Lloris": 11, "Bastian Schweinsteiger": 10, "Xabi Alonso": 9, "Patrick Vieira": 8, "Alexis Mac Allister": 8,
+        "Enzo Fernandez": 7, "Juan Mata": 7, "Gerard Pique": 6, "Pedro": 6, "Robert Pires": 5,
+        "Raphael Varane": 5, "Cristian Romero": 4, "Lisandro Martinez": 4, "Lukas Podolski": 3, "Fabien Barthez": 2,
+        "Emmanuel Petit": 2, "Andre Schurrle": 2, "Per Mertesacker": 2, "Gilberto Silva": 2, "Marcel Desailly": 2,
+        "Laurent Blanc": 1, "Frank Leboeuf": 1, "Juliano Belletti": 1, "Klebererson": 1, "Roque Junior": 1
+      }
+    },
+    {
+      prompt: "Name a Premier League Golden Boot Winner",
+      wikiHint: ["Premier League Golden Boot", "Premier League"],
+      answers: {
+        "Erling Haaland": 30, "Mohamed Salah": 28, "Harry Kane": 26, "Thierry Henry": 25, "Cristiano Ronaldo": 24,
+        "Sergio Aguero": 20, "Didier Drogba": 15, "Robin van Persie": 14, "Luis Suarez": 14, "Jamie Vardy": 13,
+        "Son Heung-min": 13, "Sadio Mane": 12, "Pierre-Emerick Aubameyang": 11, "Alan Shearer": 9, "Michael Owen": 8,
+        "Carlos Tevez": 7, "Ruud van Nistelrooy": 7, "Dimitar Berbatov": 6, "Nicolas Anelka": 6, "Dwight Yorke": 3,
+        "Jimmy Floyd Hasselbaink": 2, "Teddy Sheringham": 2, "Kevin Phillips": 1, "Dion Dublin": 1, "Chris Sutton": 1
+      }
+    },
+    {
+      prompt: "Name a Premier League Goalkeeper with 100+ Career Clean Sheets",
+      wikiHint: ["Premier League", "goalkeeper", "clean sheets"],
+      answers: {
+        "Petr Cech": 30, "David de Gea": 27, "Alisson Becker": 23, "Ederson": 22, "Edwin van der Sar": 20,
+        "Peter Schmeichel": 19, "Joe Hart": 15, "Hugo Lloris": 14, "Pepe Reina": 13, "Tim Howard": 12,
+        "David Seaman": 11, "Jordan Pickford": 10, "Brad Friedel": 6, "Mark Schwarzer": 5, "Shay Given": 5,
+        "David James": 3, "Ben Foster": 3, "Jussi Jaaskelainen": 2, "Nigel Martyn": 2, "Lukasz Fabianski": 2,
+        "Thomas Sorensen": 1, "Kasey Keller": 1
+      }
+    }
+  ],
+  NBA: [
+    {
+      prompt: "Name an NBA Player who has scored 60+ Points in a Single Game",
+      wikiHint: ["single-game scoring", "60 points", "NBA"],
+      answers: {
+        "Wilt Chamberlain": 32, "Kobe Bryant": 31, "Michael Jordan": 28, "LeBron James": 26, "Stephen Curry": 25,
+        "Luka Doncic": 24, "James Harden": 22, "Damian Lillard": 16, "Joel Embiid": 15, "Devin Booker": 15,
+        "Giannis Antetokounmpo": 14, "Jayson Tatum": 13, "Klay Thompson": 13, "Donovan Mitchell": 12,
+        "Carmelo Anthony": 11, "Allen Iverson": 9, "Shaquille O'Neal": 9, "Larry Bird": 8, "Kyrie Irving": 8,
+        "Karl-Anthony Towns": 7, "Tracy McGrady": 6, "Elgin Baylor": 4, "David Robinson": 3, "Jalen Brunson": 3,
+        "De'Aaron Fox": 2, "Kemba Walker": 2, "Bradley Beal": 2, "Gilbert Arenas": 2, "Pete Maravich": 2,
+        "Bernard King": 2, "Karl Malone": 2, "Jerry West": 2, "George Gervin": 1, "Tom Chambers": 1, "Rick Barry": 1
+      }
+    },
+    {
+      prompt: "Name an NBA Regular Season MVP Winner",
+      wikiHint: ["NBA Most Valuable Player", "NBA"],
+      answers: {
+        "Michael Jordan": 33, "LeBron James": 32, "Stephen Curry": 28, "Nikola Jokic": 26, "Kobe Bryant": 25,
+        "Giannis Antetokounmpo": 24, "Shaquille O'Neal": 22, "Kevin Durant": 18, "Kareem Abdul-Jabbar": 17,
+        "Joel Embiid": 16, "Larry Bird": 16, "Magic Johnson": 16, "Russell Westbrook": 15, "James Harden": 15,
+        "Tim Duncan": 14, "Wilt Chamberlain": 12, "Bill Russell": 11, "Allen Iverson": 9, "Derrick Rose": 9,
+        "Dirk Nowitzki": 8, "Steve Nash": 8, "Kevin Garnett": 7, "Charles Barkley": 7, "Hakeem Olajuwon": 7,
+        "Karl Malone": 6, "Julius Erving": 3, "David Robinson": 3, "Moses Malone": 2, "Oscar Robertson": 2,
+        "Bill Walton": 2, "Bob Cousy": 1, "Bob Pettit": 1, "Bob McAdoo": 1, "Dave Cowens": 1, "Willis Reed": 1, "Wes Unseld": 1
+      }
+    },
+    {
+      prompt: "Name an NBA Franchise that has won a Championship since 1980",
+      wikiHint: ["NBA Finals", "NBA championship"],
+      answers: {
+        "Los Angeles Lakers": 33, "Chicago Bulls": 30, "Golden State Warriors": 29, "Boston Celtics": 28,
+        "San Antonio Spurs": 23, "Miami Heat": 22, "Cleveland Cavaliers": 16, "Denver Nuggets": 14,
+        "Detroit Pistons": 13, "Dallas Mavericks": 13, "Houston Rockets": 12, "Milwaukee Bucks": 12,
+        "Toronto Raptors": 11, "Philadelphia 76ers": 5
+      }
+    },
+    {
+      prompt: "Name an NBA Player with 2,000+ Career 3-Pointers Made",
+      wikiHint: ["three-point field goals", "NBA"],
+      answers: {
+        "Stephen Curry": 35, "Ray Allen": 26, "James Harden": 24, "Damian Lillard": 22, "Reggie Miller": 21,
+        "Klay Thompson": 21, "LeBron James": 20, "Kevin Durant": 15, "Paul George": 14, "Kyle Korver": 12,
+        "Vince Carter": 11, "Jason Terry": 10, "Jamal Crawford": 10, "Paul Pierce": 7, "J.R. Smith": 7,
+        "Buddy Hield": 6, "Eric Gordon": 6, "Dirk Nowitzki": 6, "Chauncey Billups": 5, "Kyle Lowry": 3,
+        "Jason Kidd": 3, "CJ McCollum": 3, "Tim Hardaway Jr.": 2, "Joe Johnson": 2, "Mike Conley": 2,
+        "Wesley Matthews": 1, "Nicolas Batum": 1
+      }
+    },
+    {
+      prompt: "Name an NBA #1 Overall Draft Pick since 1995",
+      wikiHint: ["first overall draft picks", "NBA draft"],
+      answers: {
+        "LeBron James": 34, "Victor Wembanyama": 26, "Anthony Edwards": 24, "Allen Iverson": 23, "Tim Duncan": 22,
+        "Kyrie Irving": 21, "Anthony Davis": 20, "Zion Williamson": 16, "Dwight Howard": 15, "Derrick Rose": 15,
+        "Yao Ming": 14, "Blake Griffin": 13, "Karl-Anthony Towns": 12, "Cade Cunningham": 11, "Paolo Banchero": 11,
+        "Ben Simmons": 9, "John Wall": 8, "Andrew Wiggins": 7, "Deandre Ayton": 6, "Markelle Fultz": 5,
+        "Zaccharie Risacher": 4, "Elton Brand": 4, "Kenyon Martin": 3, "Kwame Brown": 2, "Greg Oden": 2,
+        "Andrew Bogut": 2, "Anthony Bennett": 2, "Joe Smith": 1, "Michael Olowokandi": 1, "Andrea Bargnani": 1
+      }
+    },
+    {
+      prompt: "Name an NBA Defensive Player of the Year Winner",
+      wikiHint: ["NBA Defensive Player of the Year", "NBA"],
+      answers: {
+        "Rudy Gobert": 28, "Dwight Howard": 24, "Giannis Antetokounmpo": 22, "Kawhi Leonard": 21, "Draymond Green": 21,
+        "Ben Wallace": 18, "Dikembe Mutombo": 17, "Michael Jordan": 16, "Hakeem Olajuwon": 15, "Kevin Garnett": 14,
+        "Marcus Smart": 11, "Jaren Jackson Jr.": 10, "Dennis Rodman": 9, "Joakim Noah": 7, "Marc Gasol": 7,
+        "Tyson Chandler": 6, "David Robinson": 6, "Metta World Peace": 5, "Ron Artest": 5, "Gary Payton": 4,
+        "Alonzo Mourning": 3, "Marcus Camby": 2, "Sidney Moncrief": 1, "Mark Eaton": 1, "Michael Cooper": 1, "Alvin Robertson": 1
+      }
+    }
+  ]
+};
+
+// Nickname / Alias Dictionary so shorthand guesses always get credit
+const ALIAS_MAP = {
+  "aroid": "Alex Rodriguez", "arod": "Alex Rodriguez", "bigpapi": "David Ortiz", "thekid": "Ken Griffey Jr.",
+  "griffey": "Ken Griffey Jr.", "schwarbomb": "Kyle Schwarber", "jroll": "Jimmy Rollins", "chooch": "Carlos Ruiz",
+  "doc": "Roy Halladay", "kingfelix": "Felix Hernandez", "bigunit": "Randy Johnson", "shohei": "Shohei Ohtani",
+  "acuna": "Ronald Acuna Jr.", "calripken": "Cal Ripken Jr.", "ripken": "Cal Ripken Jr.",
+  "phillies": "Philadelphia Phillies", "yankees": "New York Yankees", "redsox": "Boston Red Sox",
+  "dodgers": "Los Angeles Dodgers", "giants": "San Francisco Giants", "astros": "Houston Astros",
+  "braves": "Atlanta Braves", "cardinals": "St. Louis Cardinals", "cubs": "Chicago Cubs", "rangers": "Texas Rangers",
+  "nationals": "Washington Nationals", "bluejays": "Toronto Blue Jays", "royals": "Kansas City Royals",
+  "diamondbacks": "Arizona Diamondbacks", "dbacks": "Arizona Diamondbacks", "whitesox": "Chicago White Sox",
+  "marlins": "Miami Marlins", "angels": "Los Angeles Angels", "twins": "Minnesota Twins", "reds": "Cincinnati Reds",
+  "bigben": "Ben Roethlisberger", "megatron": "Calvin Johnson", "ochocinco": "Chad Johnson",
+  "shady": "LeSean McCoy", "beastmode": "Marshawn Lynch", "lt": "LaDainian Tomlinson", "ap": "Adrian Peterson",
+  "bdawk": "Brian Dawkins", "weaponx": "Brian Dawkins", "gronk": "Rob Gronkowski", "djax": "DeSean Jackson",
+  "ajbrown": "A.J. Brown", "jjwatt": "J.J. Watt", "tjwatt": "T.J. Watt", "maclion": "Jeremy Maclin",
+  "eagles": "Philadelphia Eagles", "patriots": "New England Patriots", "pats": "New England Patriots",
+  "chiefs": "Kansas City Chiefs", "steelers": "Pittsburgh Steelers", "cowboys": "Dallas Cowboys",
+  "49ers": "San Francisco 49ers", "niners": "San Francisco 49ers", "packers": "Green Bay Packers",
+  "broncos": "Denver Broncos", "ravens": "Baltimore Ravens", "seahawks": "Seattle Seahawks",
+  "rams": "Los Angeles Rams", "bucs": "Tampa Bay Buccaneers", "buccaneers": "Tampa Bay Buccaneers",
+  "dolphins": "Miami Dolphins", "colts": "Indianapolis Colts", "saints": "New Orleans Saints",
+  "raiders": "Las Vegas Raiders", "commanders": "Washington Commanders", "redskins": "Washington Redskins",
+  "bears": "Chicago Bears", "jets": "New York Jets",
+  "cr7": "Cristiano Ronaldo", "r9": "Ronaldo 9 (R9)", "kunaguero": "Sergio Aguero", "son": "Son Heung-min",
+  "heungminson": "Son Heung-min", "rvp": "Robin van Persie", "vvd": "Virgil van Dijk", "kdb": "Kevin De Bruyne",
+  "debruyne": "Kevin De Bruyne", "manunited": "Manchester United", "manutd": "Manchester United",
+  "manu": "Manchester United", "mancity": "Manchester City", "city": "Manchester City",
+  "spurs": "Tottenham Hotspur", "tottenham": "Tottenham Hotspur", "newcastle": "Newcastle United",
+  "villa": "Aston Villa", "leicester": "Leicester City", "leeds": "Leeds United",
+  "blackburn": "Blackburn Rovers", "forest": "Nottingham Forest", "derby": "Derby County", "ipswich": "Ipswich Town",
+  "mj": "Michael Jordan", "lebron": "LeBron James", "steph": "Stephen Curry", "stephcurry": "Stephen Curry",
+  "kobe": "Kobe Bryant", "wilt": "Wilt Chamberlain", "luka": "Luka Doncic", "dame": "Damian Lillard",
+  "giannis": "Giannis Antetokounmpo", "greekfreak": "Giannis Antetokounmpo", "ai": "Allen Iverson",
+  "theanswer": "Allen Iverson", "shaq": "Shaquille O'Neal", "kat": "Karl-Anthony Towns", "tmac": "Tracy McGrady",
+  "kd": "Kevin Durant", "kareem": "Kareem Abdul-Jabbar", "magic": "Magic Johnson", "kg": "Kevin Garnett",
+  "drj": "Julius Erving", "wemby": "Victor Wembanyama", "ad": "Anthony Davis", "zion": "Zion Williamson",
+  "lakers": "Los Angeles Lakers", "bulls": "Chicago Bulls", "warriors": "Golden State Warriors",
+  "celtics": "Boston Celtics", "heat": "Miami Heat", "cavs": "Cleveland Cavaliers", "cavaliers": "Cleveland Cavaliers",
+  "nuggets": "Denver Nuggets", "pistons": "Detroit Pistons", "mavs": "Dallas Mavericks", "mavericks": "Dallas Mavericks",
+  "rockets": "Houston Rockets", "bucks": "Milwaukee Bucks", "raptors": "Toronto Raptors",
+  "sixers": "Philadelphia 76ers", "76ers": "Philadelphia 76ers"
+};
+
+// Dynamic Rarity-to-Points Formula: Less popular names = lower % = HIGHER POINTS!
+function calculateRarityScore(sport, rarityPct) {
+  const r = Math.max(1, Math.min(100, Math.round(rarityPct)));
+  let pts = 45;
+  let tierIdx = 3;
+
+  if (r <= 3) {
+    // 1% = 300 PTS, 2% = 275 PTS, 3% = 250 PTS
+    pts = 250 + (3 - r) * 25;
+    tierIdx = 0;
+  } else if (r <= 9) {
+    // 4% = 234 PTS down to 9% = 150 PTS
+    pts = 150 + Math.round((9 - r) * 14);
+    tierIdx = 1;
+  } else if (r <= 18) {
+    // 10% = 144 PTS down to 18% = 90 PTS
+    pts = 90 + Math.round((18 - r) * 6);
+    tierIdx = 2;
+  } else {
+    // 19% = 85 PTS down to 35%+ = 40 PTS
+    pts = Math.max(40, 85 - Math.round((r - 19) * 2.5));
+    tierIdx = 3;
+  }
+
+  const labels = {
+    MLB: [
+      {cat: "HOME RUN! (ULTRA-RARE DEEP CUT!)", color: "#f59e0b"},
+      {cat: "TRIPLE! (RARE PICK!)", color: "#38bdf8"},
+      {cat: "DOUBLE! (UNCOMMON PICK!)", color: "#4ade80"},
+      {cat: "SINGLE! (POPULAR PICK!)", color: "#a3e635"}
+    ],
+    NFL: [
+      {cat: "TOUCHDOWN! (80-YD ULTRA-RARE CALL!)", color: "#f59e0b"},
+      {cat: "RED ZONE BOMB! (RARE PICK!)", color: "#38bdf8"},
+      {cat: "FIELD GOAL! (UNCOMMON PICK!)", color: "#4ade80"},
+      {cat: "1ST DOWN! (POPULAR PICK!)", color: "#a3e635"}
+    ],
+    EPL: [
+      {cat: "TOP-BINS SCREAMER! (ULTRA-RARE!)", color: "#f59e0b"},
+      {cat: "THROUGH-BALL ASSIST! (RARE!)", color: "#38bdf8"},
+      {cat: "CORNER KICK WON! (UNCOMMON!)", color: "#4ade80"},
+      {cat: "SLIDE TACKLE! (POPULAR PICK!)", color: "#a3e635"}
+    ],
+    NBA: [
+      {cat: "POSTER DUNK! (ULTRA-RARE PICK!)", color: "#f59e0b"},
+      {cat: "LOGO 3-POINTER! (RARE PICK!)", color: "#38bdf8"},
+      {cat: "MID-RANGE FADEAWAY! (UNCOMMON!)", color: "#4ade80"},
+      {cat: "FASTBREAK LAYUP! (POPULAR PICK!)", color: "#a3e635"}
+    ]
+  };
+
+  return { pts, rarity: r, cat: labels[sport][tierIdx].cat, color: labels[sport][tierIdx].color };
+}
+
+function normalizeStr(s) {
+  return (s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+// Levenshtein distance for typo forgiveness
+function editDistance(a, b) {
+  const dp = Array.from({length: a.length + 1}, () => Array(b.length + 1).fill(0));
+  for (let i = 0; i <= a.length; i++) dp[i][0] = i;
+  for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      dp[i][j] = a[i-1] === b[j-1]
+        ? dp[i-1][j-1]
+        : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+    }
+  }
+  return dp[a.length][b.length];
+}
+
+// Smart multi-stage matcher: Exact -> Alias -> Last Name / Team Name -> Fuzzy Typo
+function findMatchingAnswer(guess, answersDict, sport) {
+  const normG = normalizeStr(guess);
+  if (!normG) return null;
+
+  // 1. Direct normalized match
+  for (const [k, rVal] of Object.entries(answersDict)) {
+    if (normalizeStr(k) === normG) return { matched: k, rarity: rVal };
+  }
+
+  // 2. Alias map lookup
+  if (ALIAS_MAP[normG] && answersDict[ALIAS_MAP[normG]] !== undefined) {
+    const k = ALIAS_MAP[normG];
+    return { matched: k, rarity: answersDict[k] };
+  }
+  if (normG === "spurs" && sport === "NBA" && answersDict["San Antonio Spurs"]) {
+    return { matched: "San Antonio Spurs", rarity: answersDict["San Antonio Spurs"] };
+  }
+
+  // 3. Last-name or multi-word token match (if player enters "Utley", "Bonds", "Maclin", "Phillies")
+  let bestCandidate = null;
+  for (const [k, rVal] of Object.entries(answersDict)) {
+    const cleanParts = k.replace(/Jr\.|Sr\.|II|III/gi, "").trim().split(/\s+/);
+    const lastPart = normalizeStr(cleanParts[cleanParts.length - 1]);
+    const firstPart = normalizeStr(cleanParts[0]);
+    if (normG.length >= 3 && (normG === lastPart || (cleanParts.length > 1 && normG === firstPart && normG.length >= 5))) {
+      // Pick the rarer match or first match
+      if (!bestCandidate || rVal < bestCandidate.rarity) {
+        bestCandidate = { matched: k, rarity: rVal };
+      }
+    }
+  }
+  if (bestCandidate) return bestCandidate;
+
+  // 4. Fuzzy typo tolerance (1-2 characters off)
+  for (const [k, rVal] of Object.entries(answersDict)) {
+    const nk = normalizeStr(k);
+    const cleanParts = k.replace(/Jr\.|Sr\.|II|III/gi, "").trim().split(/\s+/);
+    const lastPart = normalizeStr(cleanParts[cleanParts.length - 1]);
+    const maxDist = normG.length >= 7 ? 2 : (normG.length >= 5 ? 1 : 0);
+    if (maxDist > 0 && (editDistance(normG, nk) <= maxDist || editDistance(normG, lastPart) <= 1)) {
+      return { matched: k, rarity: rVal };
+    }
+  }
+
+  return null;
+}
+
+// 5. Live Wikipedia Fallback Verification for deep-cut valid answers not in the local dictionary
+async function verifyDeepCutOnWikipedia(guess, wikiHints) {
+  if (!guess || guess.trim().length < 3) return null;
+  try {
+    const query = encodeURIComponent(`${guess.trim()}${wikiHints.join(" ")}`);
+    const url = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${query}&format=json&origin=*`; const res = await fetch(url); const data = await res.json(); const results = (data.query && data.query.search) ert{}ert{} []; if (results.length > 0) { const top = results[0]; const normGuess = normalizeStr(guess); const normTitle = normalizeStr(top.title); const snippet = (top.snippet ert{}ert{} "").toLowerCase(); const titleMatches = normTitle.includes(normGuess) ert{}ert{} normGuess.includes(normTitle); const hintMatches = wikiHints.some(h => snippet.includes(h.toLowerCase()) ert{}ert{} top.title.toLowerCase().includes(h.toLowerCase())); if (titleMatches && hintMatches) { return { matched: top.title.replace(/\s*\(.*?\)\s*/g, ""), rarity: 1 }; } } } catch (e) {} return null; }  // ============================================================================ // LOCAL STATE ENGINE (WORKS STANDALONE ON GITHUB PAGES / NETLIFY OR WITH FLASK) // ============================================================================ const STORAGE_KEY = "jermey_maclion_v2_state"; let currentSport = "MLB"; let stateData = null; let activePlayer = null; let avatarImgObj = new Image();  function getTodayStr() { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }  function getDailyQuestions(sport) { const qs = QUESTIONS_BANK[sport]; return qs.map((q, i) => ({ q_num: i + 1, prompt: `Question ${i + 1} of 6: ${q.prompt}`, answers: q.answers, wikiHint: q.wikiHint })); }  function getDailyRoster(sport) { return ALL_PLAYERS_POOL[sport].map(p => { const copy = Object.assign({}, p); if (sport === "MLB") { copy.stats = `Pitch: ${p.tier >= 5 ? "Slow-Mo" : (p.tier >= 3 ? "Medium" : "Fast")} | Green Box: ${p.green_size}px ert{} Power:${p.power}`;
+    } else if (sport === "NFL") {
+      copy.stats = `Speed: ${p.run_speed} ert{} Dodge Agility:${p.agility}`;
+    } else {
+      copy.stats = `Meter Speed: ${p.meter_speed} | Green Zone: ${p.green_zone}\% ert{} Flash:${p.flash_ms}ms`;
+    }
+    return copy;
+  });
+}
+
+function loadLocalDB() {
+  const today = getTodayStr();
+  let db = null;
+  try {
+    db = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  } catch (e) {}
+  if (!db) {
+    db = {
+      points: 0,
+      owned_players: {},
+      selected_players: {},
+      daily_points: {},
+      daily_progress: {},
+      pick_counts: {}
+    };
+  }
+  if (db.daily_points[today] === undefined) db.daily_points[today] = 0;
+  if (!db.daily_progress[today]) db.daily_progress[today] = {};
+  if (!db.pick_counts) db.pick_counts = {};
+  saveLocalDB(db);
+  return db;
+}
+
+function saveLocalDB(db) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+}
+
+function buildClientState(sport) {
+  const db = loadLocalDB();
+  const today = getTodayStr();
+  const roster = getDailyRoster(sport);
+  const questions = getDailyQuestions(sport);
+
+  if (!db.daily_progress[today][sport]) {
+    db.daily_progress[today][sport] = { history: [], total_pts: 0 };
+  }
+  if (!db.owned_players[sport]) {
+    db.owned_players[sport] = [roster[0].id];
+  }
+  const selId = db.selected_players[sport] || roster[0].id;
+  const selPlayer = roster.find(p => p.id === selId) || roster[0];
+  saveLocalDB(db);
+
+  return {
+    date: today,
+    points: db.points,
+    today_points: db.daily_points[today] || 0,
+    daily_points: db.daily_points,
+    owned_players: db.owned_players[sport],
+    selected_player: selPlayer,
+    roster: roster,
+    questions: questions,
+    sport_progress: db.daily_progress[today][sport]
+  };
+}
+
+let animFrameId = null;
+let challengeActive = false;
+let ballY = 75, ballRadius = 6, ballSpeed = 4;
+let strikeTop = 195, strikeHeight = 50;
+let hitBallAnim = null;
+
+let meterX = 10, meterDir = 1, meterSpeed = 2.5;
+let isGreenFlash = true, lastFlashToggle = 0, flashIntervalMs = 600;
+let targetWidthPct = 35;
+
+let runner = {x: 320, y: 295, r: 16, speed: 5, agility: 5};
+let keysPressed = {};
+let obstacles = [];
+
+setInterval(() => {
+  const now = new Date();
+  const midnight = new Date();
+  midnight.setHours(24, 0, 0, 0);
+  const diff = Math.max(0, Math.floor((midnight - now) / 1000));
+  const hrs = String(Math.floor(diff / 3600)).padStart(2, "0");
+  const mins = String(Math.floor((diff % 3600) / 60)).padStart(2, "0");
+  const secs = String(diff % 60).padStart(2, "0");
+  document.getElementById("hudCountdown").innerText = `${hrs}:${mins}:${secs}`; if (diff === 0) fetchState(); }, 1000);  window.addEventListener("keydown", (e) => { if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) { keysPressed[e.code] = true; if (challengeActive) e.preventDefault(); } if (e.code === "Space" && challengeActive && document.activeElement.id !== "ansInput") { e.preventDefault(); handleSpacebarPress(); } }); window.addEventListener("keyup", (e) => { keysPressed[e.code] = false; });  function fetchState() { stateData = buildClientState(currentSport); renderUI(); }  function switchSport(sport, btn) { if (animFrameId) cancelAnimationFrame(animFrameId); challengeActive = false; currentSport = sport; document.querySelectorAll(".sport-btn").forEach(b => b.classList.remove("active")); btn.classList.add("active"); document.getElementById("lastPlayFeedback").innerText = ""; document.getElementById("challengeOutcomeText").innerText = ""; fetchState(); }  function renderUI() { document.getElementById("hudDate").innerText = stateData.date; document.getElementById("hudTodayPts").innerText = stateData.today_points; document.getElementById("hudBankPts").innerText = stateData.points; document.getElementById("sportHeaderLabel").innerText = `${currentSport} — 6 DAILY QUESTIONS (${stateData.date})`; document.getElementById("rosterSportLabel").innerText = currentSport; document.getElementById("sixQTotal").innerText = stateData.sport_progress.total_pts;  activePlayer = stateData.selected_player; avatarImgObj = new Image(); avatarImgObj.src = activePlayer.img;  const pRow = document.getElementById("qProgressRow"); pRow.innerHTML = ""; const history = stateData.sport_progress.history; for (let i = 0; i < 6; i++) { const h = history[i]; if (h) { const cls = h.pts > 0 ? "done" : "miss"; const rarBadge = h.pts > 0 ? ` (${h.rarity}% Rarity)` : "";
+      pRow.innerHTML += `<div class="q-step ${cls}">Q${i+1}: +${h.pts} PTS${rarBadge}<div style="font-size:10px; color:${h.pts>0?'#4ade80':'#f87171'};">${h.cat}</div><div style="font-size:10px; color:#cbd5e1;">${h.ans}</div></div>`;
+    } else if (i === history.length) {
+      pRow.innerHTML += `<div class="q-step current">Question ${i+1}<div style="font-size:10px; color:#fbbf24;">ACTIVE</div></div>`;
+    } else {
+      pRow.innerHTML += `<div class="q-step">Question ${i+1}<div style="font-size:10px; color:#64748b;">WAITING</div></div>`;
+    }
+  }
+
+  const qIdx = history.length;
+  const popUp = document.getElementById("postSixPopUp");
+  const inputRow = document.getElementById("inputRowBox");
+
+  if (qIdx < 6) {
+    document.getElementById("qPromptText").innerText = stateData.questions[qIdx].prompt;
+    inputRow.style.display = "flex";
+    popUp.style.display = "none";
+  } else {
+    document.getElementById("qPromptText").innerHTML = `🏆 ALL 6 ${currentSport} QUESTIONS GRADED! Final Score: <span style="color:#4ade80;">${stateData.sport_progress.total_pts} PTS</span>!`;
+    inputRow.style.display = "none";
+    popUp.style.display = "block";
+  }
+
+  const rGrid = document.getElementById("rosterGrid");
+  rGrid.innerHTML = "";
+  stateData.roster.forEach(p => {
+    const owned = stateData.owned_players.includes(p.id) || p.cost === 0;
+    const isSel = activePlayer.id === p.id;
+    const initials = p.name.split(" ").map(w => w[0]).join("");
+    const fallbackSvg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><rect width='100%' height='100%' fill='%231e3a8a'/><text x='50%' y='58%' font-size='26' fill='%23fbbf24' font-family='sans-serif' font-weight='bold' text-anchor='middle'>${initials}</text></svg>`;
+    rGrid.innerHTML += `
+      <div class="player-card ${isSel ? 'selected' : ''}">
+        <img src="${p.img}" class="cartoon-headshot" onerror="this.src='${fallbackSvg}'">
+        <div class="p-info">
+          <div class="p-name">${p.name}</div>
+          <div class="p-tier">${p.role}</div>
+          <div class="p-stats">${p.stats}</div>
+          <button class="buy-btn" style="background:${isSel ? '#22c55e' : (owned ? '#38bdf8' : '#fbbf24')}" onclick="buyOrSelectPlayer('${p.id}')">
+            ${isSel ? '✔ SELECTED' : (owned ? 'SELECT PLAYER' : 'BUY (' + p.cost + ' PTS)')}
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  const dList = document.getElementById("dailyHistoryList");
+  dList.innerHTML = "";
+  Object.entries(stateData.daily_points).reverse().forEach(([dt, pts]) => {
+    dList.innerHTML += `<div style="display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #1e293b;">
+      <span>📅 ${dt}</span><strong style="color:#4ade80;">+${pts} PTS</strong>
+    </div>`;
+  });
+
+  updateChallengeBanner();
+  drawChallengeIdle();
+}
+
+async function submitAnswer() {
+  const inp = document.getElementById("ansInput");
+  const guess = inp.value.trim();
+  if (!guess) return;
+
+  const db = loadLocalDB();
+  const today = getTodayStr();
+  const prog = db.daily_progress[today][currentSport];
+  const qIdx = prog.history.length;
+  if (qIdx >= 6) return;
+
+  const currentQ = stateData.questions[qIdx];
+  document.getElementById("lastPlayFeedback").innerText = "⏳ Checking answer & rarity...";
+
+  // Step 1: Check comprehensive database + aliases + last names + fuzzy typos
+  let matchObj = findMatchingAnswer(guess, currentQ.answers, currentSport);
+
+  // Step 2: Live Wikipedia verification fallback for ultra-obscure correct players
+  if (!matchObj) {
+    matchObj = await verifyDeepCutOnWikipedia(guess, currentQ.wikiHint);
+  }
+
+  inp.value = "";
+  if (matchObj) {
+    // Adjust rarity slightly if picked repeatedly by user
+    const pickKey = `${currentSport}-q${qIdx}-${matchObj.matched}`; const timesPicked = db.pick_counts[pickKey] ert{}ert{} 0; db.pick_counts[pickKey] = timesPicked + 1; const adjustedRarity = Math.min(40, matchObj.rarity + timesPicked);  const scored = calculateRarityScore(currentSport, adjustedRarity); prog.history.push({ q: qIdx + 1, ans: matchObj.matched, rarity: scored.rarity, pts: scored.pts, cat: scored.cat }); prog.total_pts += scored.pts; db.points += scored.pts; db.daily_points[today] = (db.daily_points[today] ert{}ert{} 0) + scored.pts; saveLocalDB(db);  document.getElementById("lastPlayFeedback").innerHTML = `✅ Q${qIdx+1}: <strong>${matchObj.matched}</strong> (Popularity/Rarity:${scored.rarity}%) ➡️ <span style="color:${scored.color}">${scored.cat} (+${scored.pts} PTS!)</span>`;
+  } else {
+    prog.history.push({
+      q: qIdx + 1,
+      ans: guess,
+      rarity: 0,
+      pts: 0,
+      cat: "MISS (0 PTS)"
+    });
+    saveLocalDB(db);
+    document.getElementById("lastPlayFeedback").innerHTML =
+      `❌ Q${qIdx+1} MISS! '${guess}' did not match this category (+0 PTS).`;
+  }
+
+  fetchState();
+}
+
+function buyOrSelectPlayer(playerId) {
+  const db = loadLocalDB();
+  const roster = getDailyRoster(currentSport);
+  const target = roster.find(p => p.id === playerId);
+  if (!target) return;
+
+  const owned = db.owned_players[currentSport] || [roster[0].id];
+  if (owned.includes(playerId) || target.cost === 0) {
+    db.selected_players[currentSport] = playerId;
+    saveLocalDB(db);
+    fetchState();
+    return;
+  }
+
+  if (db.points < target.cost) {
+    alert(`Need ${target.cost} PTS to unlock${target.name}!`);
+    return;
+  }
+
+  db.points -= target.cost;
+  owned.push(playerId);
+  db.owned_players[currentSport] = owned;
+  db.selected_players[currentSport] = playerId;
+  saveLocalDB(db);
+  fetchState();
+}
+
+function resetCurrentSportTesting() {
+  const db = loadLocalDB();
+  const today = getTodayStr();
+  db.daily_progress[today][currentSport] = { history: [], total_pts: 0 };
+  saveLocalDB(db);
+  document.getElementById("lastPlayFeedback").innerText = "";
+  fetchState();
+}
+
+function updateChallengeBanner() {
+  const titles = {
+    MLB: `⚾ MLB STRIKE ZONE CHALLENGE — Batter: ${activePlayer.name}`,
+    EPL: `⚽ EPL CROSSBAR CHALLENGE — Striker: ${activePlayer.name}`,
+    NFL: `🏈 NFL END ZONE RUN — Runner: ${activePlayer.name}`,
+    NBA: `🏀 NBA HALF-COURT SHOT — Shooter: ${activePlayer.name}`
+  };
+  const hints = {
+    MLB: `Press SPACEBAR right when the pitched ball enters the GREEN STRIKE ZONE!`,
+    EPL: `Sliding meter flashes GREEN & RED — Press SPACEBAR inside the center box while it is GREEN!`,
+    NFL: `Use Keyboard ARROW KEYS (↑ ↓ ← →) to dodge defenders and reach the END ZONE!`,
+    NBA: `Sliding meter flashes GREEN & RED — Press SPACEBAR inside the center box while it is GREEN!`
+  };
+  document.getElementById("challengeTitle").innerText = titles[currentSport];
+  document.getElementById("challengeControlsHint").innerText = hints[currentSport];
+}
+
+function drawCartoonAvatarHead(ctx, x, y, radius) {
+  ctx.save();
+  ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
+  try { ctx.drawImage(avatarImgObj, x - radius, y - radius, radius * 2, radius * 2); } catch (e) { ctx.fillStyle = "#fbbf24"; ctx.fill(); }
+  ctx.restore();
+  ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = "#fbbf24"; ctx.lineWidth = 3; ctx.stroke();
+}
+
+function drawChallengeIdle() {
+  const c = document.getElementById("gameCanvas");
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = currentSport === "NBA" ? "#5c240a" : (currentSport === "EPL" ? "#14532d" : "#0f3d23");
+  ctx.fillRect(0, 0, c.width, c.height);
+  drawCartoonAvatarHead(ctx, c.width/2, 115, 42);
+  ctx.fillStyle = "#fbbf24"; ctx.font = "bold 20px sans-serif"; ctx.textAlign = "center";
+  ctx.fillText(`${activePlayer.name} Ready!`, c.width/2, 185);
+  ctx.fillStyle = "#ffffff"; ctx.font = "bold 14px sans-serif";
+  ctx.fillText(`Click "START CHALLENGE" above to play!`, c.width/2, 215);
+}
+
+function startSportChallenge() {
+  if (animFrameId) cancelAnimationFrame(animFrameId);
+  challengeActive = true;
+  hitBallAnim = null;
+  document.getElementById("challengeOutcomeText").innerText = "";
+  const canvas = document.getElementById("gameCanvas");
+  canvas.focus();
+
+  if (currentSport === "MLB") {
+    ballY = 82; ballRadius = 5; ballSpeed = activePlayer.pitch_speed;
+    strikeHeight = activePlayer.green_size; strikeTop = 225 - (strikeHeight / 2);
+    loopMLB();
+  } else if (currentSport === "EPL" || currentSport === "NBA") {
+    meterX = 10; meterDir = 1; meterSpeed = activePlayer.meter_speed;
+    targetWidthPct = activePlayer.green_zone; flashIntervalMs = activePlayer.flash_ms;
+    isGreenFlash = true; lastFlashToggle = performance.now();
+    loopFlashingMeter();
+  } else if (currentSport === "NFL") {
+    runner = {x: 320, y: 300, r: 16, speed: activePlayer.run_speed, agility: activePlayer.agility};
+    obstacles = [
+      {x: 140, y: 235, vx: 2.5, r: 16, label: "LB"},
+      {x: 480, y: 190, vx: -2.9, r: 16, label: "CB"},
+      {x: 220, y: 145, vx: 3.2, r: 16, label: "SS"},
+      {x: 420, y: 95,  vx: -3.5, r: 16, label: "FS"},
+      {x: 200, y: 210, vx: 0, r: 14, label: "CONE"},
+      {x: 440, y: 160, vx: 0, r: 14, label: "BAG"}
+    ];
+    loopNFL();
+  }
+}
+
+function loopMLB() {
+  const c = document.getElementById("gameCanvas");
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = "#38bdf8"; ctx.fillRect(0, 0, c.width, 85);
+  ctx.fillStyle = "#065f46"; ctx.fillRect(0, 68, c.width, 22);
+  ctx.fillStyle = "#15803d"; ctx.fillRect(0, 90, c.width, 250);
+  ctx.fillStyle = "#b45309";
+  ctx.beginPath(); ctx.ellipse(320, 92, 42, 13, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(245, 340); ctx.lineTo(395, 340); ctx.lineTo(348, 95); ctx.lineTo(292, 95); ctx.fill();
+
+  ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 3;
+  ctx.strokeRect(275, 160, 90, 125);
+  ctx.fillStyle = "rgba(34, 197, 94, 0.58)";
+  ctx.fillRect(278, strikeTop, 84, strikeHeight);
+  ctx.strokeStyle = "#4ade80"; ctx.lineWidth = 2; ctx.strokeRect(278, strikeTop, 84, strikeHeight);
+
+  ctx.fillStyle = "#1e3a8a"; ctx.fillRect(185, 195, 38, 95);
+  drawCartoonAvatarHead(ctx, 204, 165, 28);
+  ctx.fillStyle = "#fbbf24"; ctx.font = "bold 13px sans-serif"; ctx.textAlign = "center";
+  ctx.fillText(activePlayer.name, 204, 310);
+
+  if (hitBallAnim) {
+    hitBallAnim.x += hitBallAnim.vx; hitBallAnim.y += hitBallAnim.vy; hitBallAnim.vy += 0.12;
+    ctx.beginPath(); ctx.fillStyle = "#fbbf24"; ctx.arc(hitBallAnim.x, hitBallAnim.y, 9, 0, Math.PI*2); ctx.fill();
+    if (hitBallAnim.y > -30 && hitBallAnim.x < 680) requestAnimationFrame(loopMLB);
+    return;
+  }
+  if (!challengeActive) return;
+
+  ballY += ballSpeed;
+  ballRadius = 5 + ((ballY - 82) / 220) * 12;
+  ctx.beginPath(); ctx.fillStyle = "#ffffff"; ctx.arc(320, ballY, Math.max(5, ballRadius), 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 2; ctx.stroke();
+
+  if (ballY > 315) {
+    challengeActive = false;
+    finishChallenge(false, "⚾ STRIKE! The ball passed through the zone!");
+    return;
+  }
+  animFrameId = requestAnimationFrame(loopMLB);
+}
+
+function loopFlashingMeter() {
+  const now = performance.now();
+  if (now - lastFlashToggle > flashIntervalMs) { isGreenFlash = !isGreenFlash; lastFlashToggle = now; }
+  if (challengeActive) {
+    meterX += meterDir * meterSpeed;
+    if (meterX >= 98) { meterX = 98; meterDir = -1; }
+    if (meterX <= 2) { meterX = 2; meterDir = 1; }
+  }
+
+  const c = document.getElementById("gameCanvas");
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0, 0, c.width, c.height);
+
+  if (currentSport === "EPL") {
+    ctx.fillStyle = "#15803d"; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 8; ctx.strokeRect(140, 40, 360, 140);
+    drawCartoonAvatarHead(ctx, 110, 200, 28);
+    ctx.fillStyle = "#fbbf24"; ctx.font = "bold 15px sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("⚽ CROSSBAR CHALLENGE — Press SPACEBAR on GREEN!", c.width/2, 24);
+  } else {
+    ctx.fillStyle = "#7c2d12"; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 4; ctx.strokeRect(260, 38, 120, 75);
+    ctx.strokeStyle = "#f97316"; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(320, 105, 22, 0, Math.PI*2); ctx.stroke();
+    drawCartoonAvatarHead(ctx, 110, 200, 28);
+    ctx.fillStyle = "#fbbf24"; ctx.font = "bold 15px sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("🏀 HALF-COURT SHOT — Press SPACEBAR on GREEN!", c.width/2, 24);
+  }
+
+  const barX = 70, barY = 255, barW = 500, barH = 40;
+  ctx.fillStyle = "#090d16"; ctx.fillRect(barX, barY, barW, barH);
+  ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 3; ctx.strokeRect(barX, barY, barW, barH);
+
+  const zoneW = (targetWidthPct / 100) * barW;
+  const zoneX = barX + (barW - zoneW) / 2;
+  ctx.fillStyle = isGreenFlash ? "#22c55e" : "#ef4444";
+  ctx.fillRect(zoneX, barY + 3, zoneW, barH - 6);
+
+  ctx.fillStyle = "#ffffff"; ctx.font = "bold 14px sans-serif"; ctx.textAlign = "center";
+  ctx.fillText(isGreenFlash ? "🟢 GREEN LIGHT — HIT SPACEBAR!" : "🔴 RED FLASH — WAIT!", c.width/2, barY - 10);
+
+  const needlePx = barX + (meterX / 100) * barW;
+  ctx.fillStyle = "#fbbf24"; ctx.fillRect(needlePx - 5, barY - 7, 10, barH + 14);
+
+  if (challengeActive) animFrameId = requestAnimationFrame(loopFlashingMeter);
+}
+
+function loopNFL() {
+  if (!challengeActive) return;
+  const c = document.getElementById("gameCanvas");
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0, 0, c.width, c.height);
+
+  ctx.fillStyle = "#15803d"; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = "#1e3a8a"; ctx.fillRect(0, 0, c.width, 50);
+  ctx.fillStyle = "#fbbf24"; ctx.font = "bold 20px sans-serif"; ctx.textAlign = "center";
+  ctx.fillText("🏈 TOUCHDOWN END ZONE 🏈", c.width/2, 32);
+
+  ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.lineWidth = 2;
+  for (let y = 50; y < 340; y += 48) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(c.width, y); ctx.stroke();
+  }
+
+  const step = runner.speed * 0.65;
+  if (keysPressed["ArrowUp"]) runner.y -= step;
+  if (keysPressed["ArrowDown"]) runner.y += step;
+  if (keysPressed["ArrowLeft"]) runner.x -= step * (runner.agility / 5.5);
+  if (keysPressed["ArrowRight"]) runner.x += step * (runner.agility / 5.5);
+
+  runner.x = Math.max(22, Math.min(c.width - 22, runner.x));
+  runner.y = Math.max(18, Math.min(c.height - 18, runner.y));
+
+  for (let ob of obstacles) {
+    ob.x += ob.vx;
+    if (ob.x < 40 || ob.x > c.width - 40) ob.vx *= -1;
+    ctx.beginPath(); ctx.fillStyle = ob.vx !== 0 ? "#ef4444" : "#f97316";
+    ctx.arc(ob.x, ob.y, ob.r, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = "#ffffff"; ctx.font = "bold 10px sans-serif"; ctx.fillText(ob.label, ob.x, ob.y + 4);
+
+    if (Math.hypot(runner.x - ob.x, runner.y - ob.y) < runner.r + ob.r - 2) {
+      challengeActive = false;
+      finishChallenge(false, `💥 TACKLED! ${activePlayer.name} brought down!`);
+      return;
+    }
+  }
+
+  drawCartoonAvatarHead(ctx, runner.x, runner.y, runner.r + 4);
+  if (runner.y <= 48) {
+    challengeActive = false;
+    finishChallenge(true, `🏈 TOUCHDOWN ${activePlayer.name.toUpperCase()}! (+300 Bonus PTS!)`);
+    return;
+  }
+  animFrameId = requestAnimationFrame(loopNFL);
+}
+
+function handleSpacebarPress() {
+  if (currentSport === "MLB") {
+    challengeActive = false;
+    if (ballY >= strikeTop - 8 && ballY <= strikeTop + strikeHeight + 8) {
+      const dist = Math.round(370 + activePlayer.power * 1.25);
+      hitBallAnim = {x: 320, y: ballY, vx: 6, vy: -9};
+      loopMLB();
+      finishChallenge(true, `⚾ HOMERUN! ${activePlayer.name.toUpperCase()} (${dist} FT! +300 PTS!)`);
+    } else {
+      finishChallenge(false, `❌ SWING AND A MISS!`);
+    }
+  } else if (currentSport === "EPL" || currentSport === "NBA") {
+    challengeActive = false;
+    const leftBound = (100 - targetWidthPct) / 2;
+    const rightBound = leftBound + targetWidthPct;
+    const inZone = (meterX >= leftBound && meterX <= rightBound);
+    if (inZone && isGreenFlash) {
+      finishChallenge(true, `🎯 CLUTCH SUCCESS by ${activePlayer.name.toUpperCase()} on GREEN! (+300 PTS!)`);
+    } else {
+      finishChallenge(false, `❌ MISSED! Wrong timing or flashing RED.`);
+    }
+  }
+}
+
+function finishChallenge(won, msg) {
+  const out = document.getElementById("challengeOutcomeText");
+  out.style.color = won ? "#4ade80" : "#f43f5e";
+  out.innerText = msg;
+  if (won) {
+    const db = loadLocalDB();
+    const today = getTodayStr();
+    db.points += 300;
+    db.daily_points[today] = (db.daily_points[today] || 0) + 300;
+    saveLocalDB(db);
+    stateData = buildClientState(currentSport);
+    document.getElementById("hudTodayPts").innerText = stateData.today_points;
+    document.getElementById("hudBankPts").innerText = stateData.points;
+  }
+}
+
+window.onload = fetchState;
+</script>
+</body>
+</html>
